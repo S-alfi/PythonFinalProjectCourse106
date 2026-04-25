@@ -1,7 +1,0 @@
-
-
-- Download Python Packages:
-
-playwright == 1.55.0
-pytest-playwright == 0.7.0
-
