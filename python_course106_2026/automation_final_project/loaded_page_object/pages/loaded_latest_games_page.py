@@ -6,33 +6,47 @@ class LoadedLatestGamesPage:
         self.page = page
 
 
-    def loaded_navigate_to_the_latest_games_page(self):
+    def navigate_to_latest_games_page(self):
 
-        # Navigate to the latest games page
+        # Navigate to the Latest Games page
 
-        latest_games_btn = self.page.get_by_role("link", name="Latest Games")
+        latest_games_btn = self.page.get_by_role("link", name="Latest Games", exact=True)
         latest_games_btn.click()
 
-        # Validate that the loaded page URL matches the expected latest games page
+        # Validate that the Loaded page URL matches the expected Latest Games page
 
-        current_url = self.page.url
-        assert "latest-games" in current_url, f"Expected 'latest-games' in {current_url}"
+        latest_games_page_url = self.page.url
+        assert "latest-games" in latest_games_page_url, f"Expected 'latest-games' in {latest_games_page_url}"
 
 
-    def loaded_click_region_toggle_button(self):
+    def navigate_to_pre_order_section(self):
 
-        # Click the region toggle button
+        # Navigate to the Pre-Order section within the Latest Games page
 
-        self.page.wait_for_selector('[class="switch-label"]', state="visible", timeout=10000)
+        pre_order_btn = self.page.get_by_role("link", name="Pre-Order", exact=True)
+        pre_order_btn.click()
 
-        region_toggle_btn = self.page.locator('[class="switch-label"]')
-        region_toggle_btn.click()
+
+    def toggle_region(self):
+
+        # Switch between Global and Local region settings to update the game list.
+
+        self.page.wait_for_selector('span[class="switch-label"]', state="visible", timeout=10000)
+
+        region_switch_btn = self.page.locator('[class="switch-label"]')
+        region_switch_btn.click()
         self.page.wait_for_timeout(3000)
 
 
-    # The loaded_sort_top_5_games function: Extracts the first five unique game franchises from a visible product list and prints their titles and prices.
+    def verify_top_5_unique_games(self):
+        """
+        The verify_top_5_unique_games function:
 
-    def loaded_sort_top_5_games(self):
+        Identifies the top 5 unique game franchises from the results.
+
+        Filters out duplicate titles from the same IP (e.g., different editions of the same game)
+        to ensure the list contains five distinct titles with their prices.
+        """
 
         latest_games_top_5_games_list = []
         seen_core_names = set()
@@ -40,6 +54,7 @@ class LoadedLatestGamesPage:
         self.page.wait_for_selector('div[class="product-info"]', state="visible", timeout=10000)
 
         products = self.page.query_selector_all('div[class="product-info"]')
+        assert len(products) > 0, "No products found on the page!"
 
         for product in products:
 
@@ -66,8 +81,37 @@ class LoadedLatestGamesPage:
             if len(latest_games_top_5_games_list) == 5:
                 break
 
+        assert len(latest_games_top_5_games_list) == 5, f"Expected 5 games, but only found {len(latest_games_top_5_games_list)}."
+
         print("Top 5 games:\n")
 
         for index, game in enumerate(latest_games_top_5_games_list, start=1):
             print(f"{index}. {game}")
+
+
+    def pre_order_first_item_and_proceed_to_checkout(self):
+
+        self.page.wait_for_url("**/latest-games?status=preorders**", timeout=10000)
+
+        # Click the first item in the Pre-Order section
+
+        first_item = self.page.locator('div[class="product-info"] a >> visible=true').first
+        first_item.scroll_into_view_if_needed()
+        clean_first_item = first_item.inner_text().strip()
+        first_item.click()
+
+        # Click the Pre-Order button to be redirected to the Checkout Page
+
+        pre_order_btn = self.page.locator('#product-buynow-button')
+        pre_order_btn.wait_for(state="visible", timeout=10000)
+        pre_order_btn.click()
+
+        # Verify that the Pre-Order action successfully redirected to the Checkout Page
+
+        try:
+            self.page.wait_for_url("**/checkout/**", timeout=15000)
+            print(f"Successfully initiated Pre-Order for: \n\n'{clean_first_item}'")
+
+        except Exception:
+            raise AssertionError(f"Timed out waiting for checkout page. Current URL: {self.page.url}")
 
