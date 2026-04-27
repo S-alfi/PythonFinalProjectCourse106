@@ -67,7 +67,7 @@ def test_sort_and_extract_top_five_unique_games(setup_playwright_loaded_website)
 
 def test_pre_order_first_available_item(setup_playwright_loaded_website):
     """
-    Test Case: Navigate to the Latest Games page and pre-order the first item.
+    Test Case: Navigate to the Latest Games page and Pre-Order the first item.
     """
     print("\n*** Running Test - 04 ***")
     page = setup_playwright_loaded_website
