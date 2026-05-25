@@ -1,5 +1,3 @@
-
-
 class LoadedHelpCenterPage:
     def __init__(self, page):
         print("\n### Help Center Page ###\n")

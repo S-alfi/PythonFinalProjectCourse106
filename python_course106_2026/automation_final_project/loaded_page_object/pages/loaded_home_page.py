@@ -1,5 +1,3 @@
-
-
 class LoadedHomePage:
     def __init__(self, page):
         print("\n### Home Page ###\n")

@@ -1,5 +1,3 @@
-
-
 class LoadedLatestGamesPage:
     def __init__(self, page):
         print("\n### Latest Games Page ###\n")
